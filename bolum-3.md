@@ -54,7 +54,7 @@ Süreç: bir uç sistemde çalışan program.
 Not: P2P mimarideki uygulamalarda hem istemci süreçleri hem de sunucu süreçleri yer alır.
 
 
-### Süreç ve Bilgiasyar arasındaki arabirimler: Soketler
+### Süreç ve Bilgisayar arasındaki arabirimler: Soketler
 - Bir süreç mesajalra ağa soket adındaki yazılımlar aracılığıyla gönderir ve alırç.
 - Soket kapı benzeşmesi:
   - Gönderici süreç mesajı kapıya (sokete) doğru iter.
@@ -68,6 +68,46 @@ Not: P2P mimarideki uygulamalarda hem istemci süreçleri hem de sunucu süreçl
   - Örnek port numaraları:
     - HTTP: 80
     - Posta (SMTP): 25
+
+#### Ağ Uygulamaları
+Farklı uç sistemler üzerinde çalışan ve ağ üzerinden birbirleriyle iletişime geçen programlardan oluşur. Örn: Web, E-Posta, vb.
+
+#### Uygulama katmanı protokolleri
+Bir uygulamanın farklı uç sistemlerde çalışan süreçlerin nasıl birbirlerine mesaj gönderip alacaklarını tanımlar. Örn: HTTP vb.
+
+Web | HTML | IE, Firefox | Apache, IIS | HTTP
+--- | --- | --- | --- | ---
+Bir ağ uygulaması | Dosya gösterme standartı | Tarayıcı program | Sunucu yazılımı | Uygulama katmanı modeli
+
+#### Uygulama Mimarisi
+Uygulama geliştiricisi tarafından tasarlanır ve uygulamanın farklı sistemler üzerinde nasıl yapılandırılacağını belirler. Örn: İşlemci-sunucu veya eşler arası
+
+#### Ağ Mimarisi
+Sabit olan ve uygulamara spesifik bir servis seti sunan yapılardır. Örnek: TCP/IP Protokol Yığını
+
+---
+
+#### Soru-Cevap
+
+- **Soru:** Uygulama programları birbirleriyle nasıl iletişime geçer?
+  - **Süreç:** Uygulamalar değil, uygulama süreçleri haberleşir.
+- **Soru:** Süreçleri bilgisayar ağları ile ne bağlar?
+  - **Soket:** Sürecin kapısı / API
+- **Soru:** Bir sürece mesaj göndermek için ne bilmek gerekir?
+  - **Adres:** 
+    - Sürecin bulunduğu bilgisayarın adresi = IP
+    - Bilgisayardaki sürecin tanımlayıcı ID'si = Port Numarası
+- **Soru:** Uygulamaların ihtiyaç duyacağı servisler nelerdir?
+  - Veri Kaybı
+    - Güvenilirlik (Reliability)
+  - Bant Genişliği
+  - Zamanlama
+  - Güvenlik (Security)
+    - Gizlilik
+    - Veri Doğruluğu
+    - Kimlik Denetimi
+
+
 
 #### Uygulama katmanı protokolleri neleri tanımlar?
 - Karşılıklı iletilen mesajlar: Örneğin istek ve cevap mesajları
@@ -99,14 +139,20 @@ Not: P2P mimarideki uygulamalarda hem istemci süreçleri hem de sunucu süreçl
 - Son nokta kimlik denetimi
 - Gönderici tarafında şifreleme, alıcı tarafında şifre çözümü (Middleman Attack olmaması için)
 
-### TCP Servisleri
-- **Bağlantı-Yönetilimli (Connection-Oriented)**: İstemci ve sunucu süreçler arasında bağlantı kurulumu gerekir.
-- **Güvenilir Taşıma (Reliable Transport)**: Gönderici ve alıcı süreçler arsaında güveniir taşıma.
-- **Akış Kontrolü (Flow Control)**: Gönderici alıcıyı sıkıştırmaz
-- **Tıkanıklık Kontrolü (Congestion Control)**: Ağ çok yüklendiğinde göndericinin gönderdiği veri miktarını kısar.
+### Internet tarafında uygulama katmanları
+Süreçlere iki farklı tipte taşıma katmanı servisi sunulur:
+- TCP Servisleri
+- UDP Servisleri
+
+#### TCP Servisleri
+- **Bağlantı-Yönetilimli (Connection-Oriented)**: İstemci ve sunucu süreçler arasında bağlantı kurulumu gerekir. Veri aktarılmadan önce kontrol mesajları ile uç sistemlerin veri aktarımından haberdar olmasıdır. Bağlantıdan yalnızca sistemler haberdardır.
+- **Güvenilir Taşıma (Reliable Transport)**: Gönderici ve alıcı süreçler arsaında güvenilir taşıma. Verinin tam, hatasız, aynı sırada olmasının sağlanması.
+- **Akış Kontrolü (Flow Control)**: Gönderici alıcıyı sıkıştırmaz. Göndericinin, alıcısının alım hızı ile orantılı gönderme hızını ayarlaması.
+- **Tıkanıklık Kontrolü (Congestion Control)**: Ağ çok yüklendiğinde gönderici, gönderdiği veri miktarını kısar. 
 - Zamanlama, minimum bant genişliği garantisi **sağlamaz**.
 
-### UDP Servisleri
+#### UDP Servisleri
+- Minimalist bir aktarım protokolüdür.
 - Gönderici ve alıcı süreçler arasında güvenilir olmayan veri iletimi
 - Bağlantı kurulumu (connection setup), güvenilirlik (reliability), akış kontrolü (flow control), tıkanıklık kontrolü (congestion control), zamanlama (timing), veya bant genişliği garantisi (bandwith guarantee) **SAĞLAMAZ**.
 - Soru: O zaman bununla neden ilgileniyoruz? Neden UDP var?
@@ -119,6 +165,15 @@ Güvenlilirlik: Tam ve doğru şekilde taşınması
 Güvenlik: Verinin değiştirilememesi, şifrelenmesi
 
 > Ancak, TCP, SSL ile güvenlik sağlayabilir. Dikkat: SSL bir protokol değildir. SSL, uygulama katmanı protokolünün hemen altında, TCP üzerinde çalışır. Bir eklenti yazılımıdır ve geliştiriciler tarafından uygulamaya güvenlik katmak için dahil edilir.
+
+Özellik | TCP | UDP
+--- |--- | ---
+Veri Kaybı | + | -
+Zamanlama | - | -
+Bant Genişliği | - | -
+Güvenilirlik | -* | -
+
+> \* SSL (Secure Socket Layer) ile TCP'de güvenlik sağlanır.
 
 ## 2.2 Web ve HTTP
 
@@ -134,18 +189,24 @@ Kısaltmalar:
   - HTTP: Hypertext transfer protocol
 
 #### HTTP
+- İstek-yanıt protokolüdür.
+- Altta yatan TCP'yi kullanır.
+- **Durumsuzdur (Stateless):** Sunucu isteklerle ilgili bilgi tutmaz.
 - Web'in yugulama katmanı protokolüdür.
 - İstemci/sunucu modeli
   - İstemci: Web nesnelerini isteyen, alan ve gösteren tarayıcı
   - Sunucu: İsteklere karşılık olarak nesneleri gönderen web sunucusu.
 - TCP kullanılır. Port 80'den yayınlanır.
 
-- Kalıcı olmayan (nonpersistent) HTTP
+- **Kalıcı olmayan (nonpersistent) HTTP**
+  - Her istek-yanıt çiftinin ayrı bir  TCP bağlantısı üzerinden gönderilmesidir. 
   - Genellikle bir TCP bağlantısı ile bir nesne gönderilir.
   - HTTP/1.0 kalıcı olmayan (nonpersistent) HTTP‘yi kullanır.
-- Kalıcı olan (persistent) HTTP
+- **Kalıcı olan (persistent) HTTP**
   - İstemci ile sunucu arasında tek bir TCP bağlantısı ile birden fazla nesne gönderilebilir.
   - HTTP/1.1 varsayılan modunda kalıcı (persistent) bağlantı kullanır
+  - **Without Pipelined:** İstek-yanıt mesajları seri olarak, birbirine dönen yanıt sonrası gönderilir.
+  - **Pipelined:** İstek-yanıt mesajları paralel gönderilebilir.
 
 ##### Kalıcı olmayan (nonpersistent) HTTP 
 Her nesne ayrı TCP bağlantısında iletilir.
@@ -170,12 +231,15 @@ Cevap zamanı (Response time):
 - Dosya iletim zamanı toplam 2RTT + İletim zamanı kadar sürer.
 
 Gidiş geliş için yapılan bağlantılar:
-TCP-İSTEK
-TCP-YANIT
---- bir rtt bitti ---
-HTML-İSTEK
-HTML-YANIT
+- TCP-İSTEK
+- TCP-YANIT
+- -/ Bir RTT Bitti /-
+- HTML-İSTEK
+- HTML-YANIT
+- -/ İkinci RTT Bitti /-
 
+Soru: Bir kullanıcı bir bağlantıya tıkladığında ilgili dosyanın istemciye gelmesi ne kadar sürer?
+Cevap: **T***rtt* + **T***iletim*
 
 ##### Kalıcı bağlantı (persistent) HTTP
 Her nesne tek TCP bağlantısında iletilir.
@@ -390,7 +454,7 @@ Kendime soru: Bant içi ve bant dışı kontrol nedir?
 
 [//]: # (TODO: Burası düzenlenecek. Bilgisayar ağları 3. slaytta daha ayrıntılı anlatılmış.)
 
-- Domain name system (Etki alan adı sistemi)
+- Domain name system (Etki alan adı sistemi) demektir.
 - Dağıtık bir veri tabanı kullanır.
 - Ana sistem adreslerinin sorgulanmasını sağlar.
 - UDP üzerinden çalışır.
