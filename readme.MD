@@ -20,9 +20,8 @@ Hata gördüğünüz yeri düzenleyip **PR** açabilirsiniz. Tüm yardımlara a�
 - 2.4 E-Posta (SMTP, POP3, IMAP)
 - 2.5 DNS
 - 2.6 Eşler arası uygulamalar
-
-
-**İleride işlenecek konular:**
+- 2.7 TCP ile soket programlama
+- 2.8 UDP ile soket programlama
 - 3.1 Taşıma katmanı servisleri
 - 3.2 Çoklama (multiplexing) ve çoklamanın çözülmesi (demultiplexing)
 - 3.3 Bağlantısız taşıma: UDP
@@ -34,6 +33,8 @@ Hata gördüğünüz yeri düzenleyip **PR** açabilirsiniz. Tüm yardımlara a�
   - bağlantı yönetimi
 - 3.6 Tıkanıklık kontrolü prensipleri
 - 3.7 TCP tıkanıklık kontrolü
+
+**İleride işlenecek konular:**
 - 4.1 Ağ katmanına giriş
 - 4.2 Sanal devre (virtual circuit- VC) ve datagram ağları
 - 4.3 Yönlendirici (router) içerisinde neler var?
