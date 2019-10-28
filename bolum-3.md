@@ -405,15 +405,146 @@ Kendime soru: Bant içi ve bant dışı kontrol nedir?
 
 Gecikmeyi azaltmak ve performansı arttırmak için tampon bellekte kaynak kayıtları (Resource Records, RR) tutulur.
  
-Tekrarlanan sorgu: 
+#### Tekrarlanan sorgu: 
 - Eşleşmeyi bulmak yerel DNS sunucusunun görevidir.
 - Yerel DNS'in iletişim kurduğu sunucular, "bende yok, ancak şuraya sor" yanıtı döner.
 - Böylece son yetkili DNS'e ulaşıp sonuca ulaşır.
 
-Yinelenen sorgu:
+![Tekrarlanan Sorgu Örneği](https://i.resimyukle.xyz/1Q7AUP.png)
+
+#### Yinelenen sorgu:
+- İsim eşleştirmenin zorluğunu başvurulan sunucuya yükler.
 - Her sunucu diğeri adına sorguyu yayarak eşleştirme sonuçlarını geri döndürür.
 
+![Yinelenen Sorgu Örneği](https://i.resimyukle.xyz/15WAVK.png)
+
 > Editör notu: (Y)ineleme, (Y)ayma'dan aklına gelsin. 
+
+### Internet’in Dizin Servisi
+- İnsanlar: pek çok tanımlayıcı: 
+  - SSN, isim, pasaport #
+- Internet ana sistemleri, yönlendiriciler:
+  - IP adreslerini (32 bit) - datagram ların adreslenmesi için kullanılırlar
+  - İnsanlar “isim”, e.g., ww.yahoo.com – kullanırlar
+
+Soru: IP adresleri ile isimler arasında eşleşme nasıl sağlanır?
+
+- DNS servisleri
+  - Ana sistem isimleri-IP adres çevirisi
+  - Ana sistem lakapları (aliasing)
+    - Kurallı (canonical) ve lakap (alias) adları
+- Posta sunucusu lakapları
+- Yük dağıtımı
+  - Çoğaltılan web sunucuları için bir IP adresi seti, bir kurallı isimle ilişkilendirilir
+
+#### Neden DNS merkezileştirilmiyor?
+- Bir tek başarısızlık noktası olması
+- Trafik hacminin çok büyük olması
+- Uzakta merkezileştirilmiş veritabanı olması
+- Bakımının zorluğu
+
+Ölçeklenemez.
+
+### Dağıtık, Hiyerarşik Veritabanı
+
+- Kök DNS Sunucuları
+  - com DNS sunucuları
+    - yahoo.com
+    - amazon.com
+  - org DNS sunucuları
+    - pbs.org
+  - edu DNS sunucuları
+    - poly.edu
+    - umass.edu
+
+- İstemci www.amazon.com için IP istiyor; birinci tahmin:
+  - İstemci com DNS sunucusunu bulmak için kök dizin sorgusu yapar
+  - İstemci com DNS sunucusunu amazon.com DNS sunucusunu bulmak için sorgular
+  - İstemci amazon.com DNS sunucusunu www.amazon.com un IP adresini almak için sorgular
+
+### DNS: Kök sunucuları
+- İsim eşleştirmesini çözemeyen yerel DNS sunucuları tarafından başvurulurlar
+- Kök DNS sunucuları:
+  - İsim eşleştirmesi bilinmiyorsa yetkili sunucuya başvururlar.
+  - Eşleştirmeyi alırlar
+  - Eşleştirmeyi yerel sunucuya gönderirler
+
+### TLD and Yetkili Sunucular
+- Üst-seviye etki alanı (TLD) sunucuları: com, org, net, edu, gibi, ve tüm üst düzey ülke etki alanlarından uk fr, ca, jp, gibi sorumludurlar 
+  - Network solutions com TLD sunucularını işletmektedir
+  - Educause edu TLD sunucularını işletmektedir
+- Yetkili DNS sunucuları: kurumların DNS sunucuları, diğer kurum sunucularına yetkili alan adı ve IP eşleşmesi sunarlar (e.g., Web ve posta).
+  - Kurum tarafından ya da servis sağlayıcı tarafından işletilebilirler
+
+### Yerel DNS Sunucuları
+- Katı bir şekilde hiyerarşiye ait değildir
+- Her ISP’ye ait bir tane vardır (yerel ISP, şirket, üniversite).
+  - “default name server”
+- Bir ana sistem DNS sorgusu yaptığında, sorgu kendi yerel DNS sunucuna gönderilir
+  - Vekil (proxy) gibi davranır, sorguyu hiyerarşiye gönderir.
+
+
+#### Etki Alanı Ad Sistemi (Domain Name System):
+- Bir DNS sunucu hiyerarşisi içerisinde uygulanan dağıtık bir veritabanı (distributed database)
+- Ana sistemlerin dağıtık veritabanı sorgulamasını sağlayan bir uygulama katmanı protokolüdür.
+  - Not: ana Internet fonksiyonu,uygulama katmanı protokolü olarak uygulanır
+  - Complexity at network’s “edge”
+
+### Tampon bellek ve kayıtları güncelleme
+
+- Bir sunucu eşleştirmeyi öğrendiğinde, eşleştirmeyi tampon belleğe alır
+  - Tampon bellek girdileri belli bir süre sonra kaybolurlar (timeout)
+  - TLD sunucuları tipik olarak yerel DNS sunucularının tampon belleğinde yer alırlar
+    - Bu nedenle kök DNS sunucularına sıklıkla başvurulmaz
+- Güncelleme/uyarı mekanizması IETF’nin tasarımındadır
+  - RFC 2136
+  - http://www.ietf.org/html.charters/dnsind-charter.html
+
+### DNS kayıtları
+DNS: kaynak kayırlarını (resource records (RR)) depolayan dağıtık veritabanı
+
+> RR biçimi: (name, value, type, ttl)
+
+- Type=A
+  - name sistem adıdır
+  - value IP adresine eşleme sunar
+- Type=NS
+  - name etki alanıdır (e.g. foo.com)
+  - value bu etki alanına ait yetkili DNS ‘in IP sine eşleme sunar
+- Type=CNAME
+  - name lakab ana sistem adıdır. **www.ibm.com** aslında **servereast.backup2.ibm.com**
+  - value kurallı ana sistem adıdır
+- Type=MX
+  - Value, name ana sistemi lakabına sahip olan bir posta sunucusunun kurallı adıdır.
+
+### DNS mesajları
+- DNS protokolü : sorgu ve cevap mesajları, aynı mesaj biçimindedir.
+
+msg başlığı
+- Tanımlama (Identification): sorgu için 16 bit lik alan kullanılır. 
+- Bayraklar (flags):
+  - (QR) Sorgu veya cevap: Request (0) or response (1)
+  - (RD) İstenen yineleme: Ask for recursive (1) or iterative (0) response
+  - (RA) Mevcut yineleme: Server manages recursive (1) or not (0)
+  - (AA) Cevap yetkilidir: Reply from authoritative (1) or from cache (0)
+- Bir sorgunun ad, tip alanları
+- Sorguya verilen cevaptaki kaynak kayıtları
+- Yetkili sunucuların kayıtları
+- Kullanılabilen ek yardımcı bilgi
+
+![DNS Mesajı](https://i.resimyukle.xyz/MGBKzU.png)
+
+Detaylı bilgi: http://www-inf.int-evry.fr/~hennequi/CoursDNS/NOTES-COURS_eng/msg.html
+
+### DNS veritabanına kayıt girmek
+- Örnek: “Network Utopia” yı yeni oluşturduk
+- networkuptopia.com adını kaydedici (registrar) ‘ye kayıt ettiririz. (örn, Network Solutions)
+  - Kaydediciye yekiliDNS sunucumuzun adı ve IP adresini de vermek gerekir (birincil ve ikincil)
+  - Kaydedici TLD sunucusuna iki RR ekler:
+    - (networkutopia.com, dns1.networkutopia.com, NS)
+    - (dns1.networkutopia.com, 212.212.212.1, A)
+- Yetkili sunucuya www.networkuptopia.com için Type A kaydı ve mail.networkutopia.com için Type MX kaydı konulur
+- Soru: İnsanlar sizin sitenizin IP adresine nasıl erişecekler?
 
 ## 2.6 Eşler arası uygulamalar
 **Napster:** Merkez sunucu üzerinden varlık tespiti yapar. Dosya paylaşımı eşler arasındadır.
