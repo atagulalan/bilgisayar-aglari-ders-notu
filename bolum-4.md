@@ -48,7 +48,7 @@ UDP | TCP
 --- | ---
 Multiplexing / Demultiplexing | Multiplexing / Demultiplexing
 Doğruluk Kontrolü | Doğruluk Kontrolü
-- | Güvenilir veri iletimi (Bağlantı kurulumu, tıkanıklık kontrolü, akış kontrolü)
+Yok | Güvenilir veri iletimi (Bağlantı kurulumu, tıkanıklık kontrolü, akış kontrolü)
 Bağlantısız, güvenilmez servis | Güvenilir, bağlantı-yönelimli servis
 
 #### Ev halkı benzeştirmesi:
