@@ -46,7 +46,7 @@ __Leonard Kleinrock__ internet bağlantısının temeli olan _Paket Anahtarlama_
 
 ### Network çeşitleri
 
- - Locan Area Network (LAN)
+ - Local Area Network (LAN)
  - Metropolitan (MAN)
  - Wide (WAN)
  - Personal (PAN)
